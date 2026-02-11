@@ -5,7 +5,7 @@
     <title>Vishal Pokharel</title>
     <meta name="author" content="Vishal Pokharel">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="images/favicon/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
 
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -13,6 +13,31 @@
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-P9XQ2MM8');</script>
+
+    <script>function openModal(src, type) {
+  var modal = document.getElementById("myModal");
+  var container = document.getElementById("modal-container");
+  modal.style.display = "block";
+  
+  if (type === 'video') {
+    container.innerHTML = `<video class="modal-content" controls autoplay loop><source src="${src}" type="video/mp4"></video>`;
+  } else {
+    container.innerHTML = `<img class="modal-content" src="${src}">`;
+  }
+}
+
+function closeModal() {
+  var modal = document.getElementById("myModal");
+  var container = document.getElementById("modal-container");
+  modal.style.display = "none";
+  container.innerHTML = ""; // Clear content to stop video playing
+}
+
+// Close modal when clicking outside the content
+window.onclick = function(event) {
+  var modal = document.getElementById("myModal");
+  if (event.target == modal) { closeModal(); }
+}</script>
     </head>
 
 
@@ -36,14 +61,14 @@
                           </p>
                           
                           <p>
-                            My goal is to develop AI agents that eventually outperform human-led SEO. I 
+                            <strong>Goal: </strong>My goal is to develop AI agents that eventually outperform human-led SEO. I 
                             believe we can build agents that are genuinely smarter and more intelligent 
                             than a person when it comes to deciding the best possible action for a 
                             business's organic growth. 
                           </p>
                           
                           <p>
-                            We are working toward a system where multiple agents handle competitor 
+                            <strong>Future plans: </strong>We are working toward a system where multiple agents handle competitor 
                             analysis, keyword research, content creation, and real-time optimization 
                             around the clock. We're starting with local services and will eventually 
                             expand to local e-commerce.
@@ -51,7 +76,8 @@
                         <p style="text-align:center">
 
                                              Email: vishalpokharel[at]seoaiagent[dot]ai &nbsp;/&nbsp;
-                            <a href="https://github.com/VishalPokharel">Github</a>
+                            <a href="https://github.com/VishalPokharel">Github</a>&nbsp;/&nbsp;
+                            <a href="https://www.linkedin.com/in/vishal-pokharel-87a250246/">Linkedin</a>
                         </p>
                           
                   
@@ -59,9 +85,26 @@
       
                     </td>
                     <td style="padding:2.5%;width:40%;max-width:40%">
-                        <a href="images/vishal-pokharel.png"><img
-                                style="width:100%;max-width:100%;object-fit: cover; border-radius: 50%;"
-                                alt="profile photo" src="images/vishal-pokharel.png" class="hoverZoomLink"></a>
+                        <!-- <a href="images/vishal-pokharel.png"> -->
+                            <!-- <img
+                                style="width:100%;max-width:100%;object-fit: cover; border-radius: 75%;"
+                                alt="profile photo" src="images/vishal-pokharel.png" class="hoverZoomLink"> -->
+                            <!-- </a> -->
+                             <div style="width:220px; height:220px; overflow:hidden; border-radius:50%;">
+  <img 
+    src="images/vishal-pokharel.png"
+    alt="profile photo"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center 60%;
+      transform:scale(1.2);
+    "
+  >
+</div>
+
+
                     </td>
                 </tr>
                 </tbody>
@@ -101,7 +144,7 @@
                         </script>
                     </td>
                     <td style="padding:20px;width:75%;vertical-align:middle">
-                        <a href="iHuman/index.html">
+                        <a href="https://www.sciencedirect.com/science/article/abs/pii/S2212054825000943">
                             <span class="papertitle">3D reconstruction of cultural heritage sites; A case study of Patan Durbar Square</span>
                         </a>
                         <br>
@@ -126,77 +169,130 @@
                 </tr>
                 </tbody>
             </table>
+
+
+
+
+
+            <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tbody>
+    <tr>
+        <td style="padding:20px;width:100%;vertical-align:middle">
+            <h2>Projects</h2>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tbody>
+
+        <tr onmouseout="arshoe_stop()" onmouseover="arshoe_start()">
+    <td style="padding:5px;width:25%;vertical-align:middle">
+        <div class="one" style="cursor:pointer" onclick="openModal('videos/Arshoe.mp4', 'video')">
+            <div class="two" id='arshoe_image'>
+                <video width=100% muted autoplay loop>
+                    <source src="videos/Arshoe.mp4" type="video/mp4">
+                </video>
+            </div>
+            <img src='images/arshoe.png' width=100%>
+        </div>
+        <script type="text/javascript">
+            function arshoe_start() { document.getElementById('arshoe_image').style.opacity = "1"; }
+            function arshoe_stop() { document.getElementById('arshoe_image').style.opacity = "0"; }
+            arshoe_stop()
+        </script>
+    </td>
+    <td style="padding:20px;width:75%;vertical-align:middle">
+        <a href="https://arxiv.org/abs/2501.18643">
+            <span class="papertitle">[2024] Virtual Try-on of Shoes: 3D Reconstruction for Augmented Reality</span>
+        </a>
+        <br>
+        <p>Developed a mobile application enabling users to virtually try on shoes...</p>
+    </td>
+</tr>
+
+<tr onmouseout="spatial_stop()" onmouseover="spatial_start()">
+    <td style="padding:5px;width:25%;vertical-align:middle">
+        <div class="one" style="cursor:pointer" onclick="openModal('videos/spatial-agent.mp4', 'video')">
+            <div class="two" id='spatial_image'>
+                <video width=100% muted autoplay loop>
+                    <source src="videos/spatial-agent.mp4" type="video/mp4">
+                </video>
+            </div>
+            <img src='images/spatial-agent.png' width=100%>
+        </div>
+        <script type="text/javascript">
+            function spatial_start() { document.getElementById('spatial_image').style.opacity = "1"; }
+            function spatial_stop() { document.getElementById('spatial_image').style.opacity = "0"; }
+            spatial_stop()
+        </script>
+    </td>
+    <td style="padding:20px;width:75%;vertical-align:middle">
+        <span class="papertitle">[2025] Spatial AI Agent for 3D Scenes</span>
+        <br>
+        <p>Built a functional prototype utilizing <a href="https://github.com/unique1i/SceneSplat">SceneSplat</a> that allows users to query Gaussian Splatting scenes via natural language. The agent can reason about spatial layout and navigate to specific areas based on user intent.</p>
+    </td>
+</tr>
+
+<tr onmouseout="room_stop()" onmouseover="room_start()">
+    <td style="padding:5px;width:25%;vertical-align:middle">
+        <div class="one" style="cursor:pointer" onclick="openModal('videos/reconfigure-demo.mp4', 'video')">
+            <div class="two" id='room_image'>
+                <video width=100% muted autoplay loop>
+                    <source src="videos/reconfigure-demo.mp4" type="video/mp4">
+                </video>
+            </div>
+            <img src='images/reconfigure-demo.png' width=100%>
+        </div>
+        <script type="text/javascript">
+            function room_start() { document.getElementById('room_image').style.opacity = "1"; }
+            function room_stop() { document.getElementById('room_image').style.opacity = "0"; }
+            room_stop()
+        </script>
+    </td>
+    <td style="padding:20px;width:75%;vertical-align:middle">
+        <span class="papertitle">[2025] 3D Asset Rearrangement and placement with natural language</span>
+        <br>
+        <p>Developed a prototype that reconfigures 3D mesh environments based on natural language instructions. The system can move objects and suggest optimal placement for new furniture.</p>
+    </td>
+</tr>
+
+
+    <tr>
+        <td colspan="2" style="padding:20px;width:100%;vertical-align:middle">
+            <ul>
+                <li><strong>[2024] LLM Scene Synthesis:</strong> Preprocessed  <a href="https://tianchi.aliyun.com/dataset/65347">3D-FRONT </a> & <a href="https://tianchi.aliyun.com/specials/promotion/3dfuture">3D-FUTURE</a> datasets into <a href="https://file.notion.so/f/f/0019e2f3-781a-81a8-864a-00039f40a446/3bbfc867-b875-40dc-b66d-b27cc320c090/scene.txt?table=block&id=3049e2f3-781a-809d-8167-f587f328d78d&spaceId=0019e2f3-781a-81a8-864a-00039f40a446&expirationTimestamp=1770861600000&signature=vG2qVTcSZsekvS4-rf9ck6gqRfQONQY2YDtex1kaSxY&downloadName=scene.txt">room-specific text descriptions and bounding box dynamics. </a> Fine-tuned a Llama model on 6k custom samples to predict furniture arrangements and suggest new items based on current room state.</li>
+                <li><strong>[2025] <a href="https://github.com/VishalPokharel/tokenizer">LLM Tokenizer:</a></strong> Implemented a Byte-Pair Encoding (BPE) tokenization system inspired by GPT-2 architecture, including custom training, encoding, and decoding processes.</li>
+                <li><strong>[2023/24] Liart.io:</strong> Developed and launched a multiplayer game, reaching 1,000+ players in the first week. Implemented iterative improvements based on user behavior analytics.</li>
+                <li><strong>[2023] <a href="https://www.youtube.com/watch?v=KLtVESr4Xhs">Fashion AI Chatbots:</a></strong> Developed AI-driven customer service prototypes for fashion brands like Brocade, focusing on personalized interaction and brand-specific knowledge.</li>
+                <li><strong>[2022] <a href="https://github.com/VishalPokharel/NFT.marketplace">NFT Marketplace:</a></strong> Built a decentralized marketplace prototype featuring community governance and automated reward mechanisms.</li>
+                          </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
             <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
                 <tbody>
                 <tr>
                     <td style="padding:20px;width:100%;vertical-align:middle">
                         <h2>Awards and Honors</h2>
                         <ul>
-                            <li><strong>Summer Undergraduate Research Fellowship, INSAIT:</strong> Selected in INSAIT's
-                                prestigious Summer Research Fellowship for undergraduate students all over the world
-                                with <b>acceptance rate as low as 3%.</b></li>
-                            <li><strong>Hult Prize Global Accelerator 2022, Boston, US:</strong> Reached to top 16 teams
-                                worldwide competing over 30K teams with my startup MeasureMe.AI.
+                            <li><strong>Recipient of Mahatma Gandhi Scholarship, 2018-19: </strong> Awarded by the Embassy of India for exceptional SEE performance, recognizing academic excellence and financial need.</li>
+                            <li><strong>Fatima Fellowship, 2024: </strong> Selected as a fellow in fellowship program, recognizing potential for advanced research in computer science/machine learning
                             </li>
-                            <li><strong>Huawei Seeds for the Future 2022:</strong> Recognized as one of the top 7
-                                computer science talents nationwide.
+                            <li><strong>Best Software Project, LOCUS 2024: </strong> Presented at LOCUS in a competitive showcase, Nepal’s largest tech event organized by students
+
                             </li>
-                            <li><strong>Start-up Seed Fund Grant Recipient, 2023:</strong> Secured <b>NPR 3.2
-                                Million</b> as a startup running fund for my college department through my startup.
-                            </li>
-                            <li><strong>Microsoft Imagine Cup 2022:</strong> Represented South Asia at the Asia
-                                Regionals.
-                            </li>
-                            <li><strong>ICT Award 2023:</strong> Finalist among Nepal’s top twelve innovators.</li>
-                            <li><strong>Hack A Week 2018, 2019:</strong> First place in AI-themed hackathon at LOCUS.
-                            </li>
-                            <li><strong>KU IT MEET 2019:</strong> Winner of the hackathon hosted by Kathmandu
-                                University.
-                            </li>
-                            <li><strong>Glocals’ 20 Under 20, 2017:</strong> Honored for driving notable societal change
-                                through IT.
-                            </li>
+                            
                         </ul>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-                <tbody>
-                <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                        <h2>Projects</h2>
-                        <ul>
-                            <li><strong>[2019] Radiograph Abnormality Detection (RAD):</strong> Developed an X-ray image
-                                abnormality detection system that excelled in competitions, winning first place at KU IT
-                                MEET 2019 and Locus 2019 AI hackathons.
-                            </li>
-                            <li><strong>[2018] VAE GAN Anime Image Colorizer:</strong> Created an image colorization
-                                tool that won the Locus 2018 national level hackathon while still in high school.
-                            </li>
-                            <li><strong>[2021] <a href="https://github.com/NisharArjyal/MathematicalToolkit">AutoDiff
-                                Package:</a></strong> Built a C++ package for automatic differentiation using dual
-                                numbers.
-                            </li>
-                            <li><strong>[2022] <a href="https://github.com/pramishp/blockchain_from_scratch">Blockchain
-                                from Scratch:</a></strong> Developed a blockchain system focusing on proof of work
-                                algorithms, enhancing understanding of blockchain fundamentals.
-                            </li>
-                            <li><strong>[2020] Vicaaya - Movie Search Engine:</strong> Developed a movie search engine
-                                using Elasticsearch for search capabilities. Engineered Scrapy scraper to scrape 100M+
-                                items throughout the internet with very coordinated distributed instances.
-                            </li>
-                            <li><strong>[2017] Carduino:</strong> Designed a mini self-driving car model utilizing
-                                smartphone camera and ultrasonic sensors, awarded at the Trinity SciTech Expo.
-                            </li>
-                            <li><strong>[2016] Proto News / Khabar Sanjal:</strong> Created a news app for Nepalese
-                                abroad at age 15, reaching over 20,000 downloads.
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
 
 
 
@@ -219,5 +315,10 @@
 </td>
 </tr>
 </table>
+
+<div id="myModal" class="modal">
+  <span class="close" onclick="closeModal()">&times;</span>
+  <div id="modal-container"></div>
+</div>
 </body>
 </html>
