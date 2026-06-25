@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Turning a video of a shoe into something you could try on | Vishal Pokharel</title>
+  <meta name="description" content="How Vishal Pokharel and his team turned short shoe videos into reconstructed 3D models for a mobile augmented-reality try-on prototype.">
+  <meta property="og:title" content="Turning a video of a shoe into something you could try on">
+  <meta property="og:description" content="A virtual shoe try-on project using segmentation, COLMAP, Gaussian Splatting, mesh extraction, and mobile AR.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://vishalpokharel.github.io/images/arshoe.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://vishalpokharel.github.io/work/ar-shoes/">
+  <link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/">Vishal Pokharel</a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/books/">Reading</a>
+      <a href="/blogs/">Blogs</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page">
+    <article class="reading">
+      <h1>Turning a video of a shoe into something you could try on</h1>
+
+      <p>For our third-year minor project, my friends and I decided to work on virtual shoe try-on.</p>
+
+      <p>The idea was easy to explain.</p>
+
+      <p>When buying shoes online, you usually see a few photographs taken from fixed angles. You can inspect the color and perhaps zoom into the material, but you cannot pick the shoe up, turn it around, or see what it might look like on your own feet.</p>
+
+      <p>We wanted to see whether someone could open a mobile application, point the camera toward their feet, and try on a realistic digital version of a shoe.</p>
+
+      <p>At first, the augmented-reality part seemed like the main problem.</p>
+
+      <p>It was not.</p>
+
+      <p>Before we could place a shoe on someone's feet, we first needed a good 3D version of the shoe. Most stores do not already have accurate 3D models of every product. Creating those models manually would take too much time and skill to be useful for a normal catalogue.</p>
+
+      <p>So the real problem became:</p>
+
+      <blockquote>
+        <p>Could we take a short video of a physical shoe and turn it into a 3D model that was good enough to use in augmented reality?</p>
+      </blockquote>
+
+      <p>That question took us through computer vision, segmentation, Gaussian Splatting, mesh extraction, foot tracking, occlusion, and mobile development.</p>
+
+      <p>The final work became our paper, <a href="https://arxiv.org/abs/2501.18643">"3D Reconstruction of Shoes for Augmented Reality"</a>.</p>
+
+      <figure class="case-media">
+        <video controls preload="metadata" poster="../../images/arshoe.png">
+          <source src="../../videos/Arshoe.mp4" type="video/mp4">
+        </video>
+        <figcaption class="caption">A demo of the reconstructed shoe inside the mobile AR try-on flow.</figcaption>
+      </figure>
+
+      <h2>We started by collecting shoes</h2>
+
+      <p>A reconstruction model does not need thousands of different shoes to build one shoe. It learns the appearance of one object from many views of that object.</p>
+
+      <p>But we also wanted the larger pipeline to work on different shoes and backgrounds. For that, we needed a reliable way to separate a shoe from everything behind it.</p>
+
+      <p>We started asking students around Pulchowk Campus if we could record their shoes.</p>
+
+      <p>We collected 101 videos of different shoes. Each video was around 30 seconds long and was recorded using whatever phones were available, including devices such as a Poco X3, Samsung Galaxy S9, Redmi 12, and others.</p>
+
+      <p>The fact that the videos came from different phones was useful. It meant the system was not being tested only on images from one controlled camera.</p>
+
+      <p>From every video, we sampled images at regular intervals. This gave us roughly 3,000 shoe images.</p>
+
+      <p>At that point, we had a large folder full of shoes photographed from different angles, on different floors, under different lighting conditions, and with different things appearing in the background.</p>
+
+      <p>The next problem was removing those backgrounds.</p>
+
+      <h2>Removing the background was more expensive than it looked</h2>
+
+      <p>For the 3D reconstruction to focus on the shoe, we needed a mask for each image: the pixels belonging to the shoe should remain, and everything else should be ignored.</p>
+
+      <p>We first used Meta's Segment Anything Model, or SAM.</p>
+
+      <p>The quality was good, but SAM required more than 6 GB of GPU memory in our setup. Hosting something that large only to separate a shoe from its background did not make much sense for the kind of application we imagined.</p>
+
+      <p>We wanted a much smaller model that could do this specific job.</p>
+
+      <p>But training a segmentation model requires an annotated dataset, and manually tracing the outline of a shoe in around 3,000 images would have taken a long time.</p>
+
+      <p>So we used the larger model to help create the dataset for the smaller one.</p>
+
+      <p>First, we trained a shoe detector using an existing dataset. The detector found a bounding box around the shoe. We then passed that box to SAM, which produced a detailed segmentation mask.</p>
+
+      <p>This automated most of the annotation process.</p>
+
+      <p>It was not perfect.</p>
+
+      <p>Sometimes the detector selected the wrong area. Sometimes SAM missed part of the shoe or included some of the background. A few frames did not contain a useful view of the shoe at all.</p>
+
+      <p>We still went through the generated annotations manually, corrected the bad ones, and removed the frames that should not have been there.</p>
+
+      <p>It was much faster than drawing every mask from the beginning, but there was still a human cleanup step between "the model generated an annotation" and "the dataset was trustworthy."</p>
+
+      <h2>Avoiding an easy mistake in the dataset</h2>
+
+      <p>When we divided the images into training, validation, and test sets, we had to be careful about one subtle problem.</p>
+
+      <p>Each 30-second video produced many similar images of the same shoe.</p>
+
+      <p>If frames from one video appeared in both the training and test sets, the model could appear unusually accurate simply because it had already seen nearly identical images during training.</p>
+
+      <p>So we wrote the split around videos rather than individual images.</p>
+
+      <p>All images extracted from one video stayed together in the same split.</p>
+
+      <p>That gave us a more honest test: the model had to segment shoes from videos it had not already seen.</p>
+
+      <p>We trained several alternatives, including YOLOv8 models and a UNet-based model. They all performed reasonably well. The best model achieved an Intersection over Union score of around 0.95.</p>
+
+      <p>More importantly for the actual application, the final segmentation model was only about 6.5 MB.</p>
+
+      <p>We had gone from depending on a model measured in gigabytes to a small model trained specifically for the problem we had.</p>
+
+      <h2>Reconstructing the shoe</h2>
+
+      <p>Once the background had been removed, we could begin turning the images into a 3D representation.</p>
+
+      <p>The first step was COLMAP.</p>
+
+      <p>COLMAP looked for visual features that appeared across multiple images. From those correspondences, it estimated where the camera had been positioned when each frame was captured and produced an initial point cloud.</p>
+
+      <p>This gave us the basic geometry and camera information required for the next stage.</p>
+
+      <p>We then trained a Gaussian Splatting model for each shoe.</p>
+
+      <p>Gaussian Splatting represents an object using a large number of small 3D Gaussians. Each Gaussian stores properties such as its position, color, opacity, scale, and orientation. When all of them are rendered together, they reproduce the appearance of the shoe from different viewpoints.</p>
+
+      <p>The training itself was surprisingly fast. A typical run of around 7,000 iterations took roughly ten minutes in our setup.</p>
+
+      <p>The result looked good when rendered as a Gaussian scene. You could rotate around the shoe and see it from viewpoints that had not appeared directly in the input video.</p>
+
+      <p>But there was another problem.</p>
+
+      <h2>Augmented-reality tools wanted a mesh</h2>
+
+      <p>Gaussian Splatting produced a good visual representation, but most existing 3D and augmented-reality tools were built to work with polygon meshes.</p>
+
+      <p>We could not simply take the splat file and place it inside the mobile AR experience.</p>
+
+      <p>We needed to convert it.</p>
+
+      <p>For this, we used SuGaR, which aligns the Gaussians toward the surface and extracts a mesh from them.</p>
+
+      <p>This was the slowest part of the reconstruction pipeline. The refinement ran for around 9,000 iterations, and extracting one mesh took approximately an hour.</p>
+
+      <p>The first meshes also contained a lot of unwanted black geometry.</p>
+
+      <p>During an earlier processing stage, the removed background had become black pixels. Those pixels later appeared as black faces in the extracted mesh.</p>
+
+      <p>So we wrote another cleanup script.</p>
+
+      <p>It removed the black vertices and kept the largest connected component, which was usually the actual shoe. We then used Blender to combine and prepare the object, material, and texture files and export them into a format the AR system could use.</p>
+
+      <p>The complete path had become:</p>
+
+      <pre><code>Short video of a shoe
+-> sampled images
+-> shoe segmentation
+-> camera estimation and point cloud
+-> Gaussian Splatting reconstruction
+-> mesh extraction
+-> mesh cleanup
+-> mobile-ready 3D shoe</code></pre>
+
+      <p>Every arrow in the diagram hid another problem we had not known about when we started.</p>
+
+      <h2>Putting the shoe on a foot</h2>
+
+      <p>Once we finally had a usable mesh, we could return to the part that had originally attracted us to the project: augmented reality.</p>
+
+      <p>We used Lens Studio for foot and leg tracking.</p>
+
+      <p>We created models for both the left and right shoes and aligned them with the user's detected feet. The system had to follow the position and orientation of the legs as the person moved.</p>
+
+      <p>Alignment alone was not enough.</p>
+
+      <p>For the shoe to look believable, parts of the real foot and leg had to correctly appear in front of or behind the virtual object.</p>
+
+      <p>Without occlusion, the digital shoe could look like it was simply floating over the image.</p>
+
+      <p>We used transparent cylinders through the openings of the shoes to help create the occlusion effect. It was a practical workaround rather than some perfect understanding of the foot, but it made the result look more natural.</p>
+
+      <p>We published the experience through Lens Studio and connected it to a Flutter mobile application using Snap's AR tooling.</p>
+
+      <p>Inside the application, a user could inspect the reconstructed shoe in 3D and then open the camera to see the shoe placed on their own feet.</p>
+
+      <p>That was the moment when all the independent parts finally became one product.</p>
+
+      <h2>It was a chain, not one model</h2>
+
+      <p>Looking back, the interesting part of this project was not any single model.</p>
+
+      <p>The application depended on a chain of systems:</p>
+
+      <ul>
+        <li>Collecting a useful video</li>
+        <li>Sampling the frames</li>
+        <li>Detecting and segmenting the shoe</li>
+        <li>Estimating the camera positions</li>
+        <li>Reconstructing the object with Gaussian Splatting</li>
+        <li>Converting the splats into a mesh</li>
+        <li>Cleaning the mesh</li>
+        <li>Tracking the feet</li>
+        <li>Handling occlusion</li>
+        <li>Loading everything inside a mobile application</li>
+      </ul>
+
+      <p>A failure in any one part affected everything after it.</p>
+
+      <p>A poor mask produced a poor reconstruction. A good Gaussian reconstruction could still produce a messy mesh. A good mesh could still look wrong if the shoe was badly aligned with the foot.</p>
+
+      <p>This was my first experience with a project where several different technical systems had to work together before the user could experience anything useful.</p>
+
+      <h2>What worked, and what did not</h2>
+
+      <p>The reconstructed shoes achieved strong image-quality results, with average PSNR values in the low-to-mid thirties across the tested examples.</p>
+
+      <p>The segmentation models also performed well, and we reduced the masking model from something requiring several gigabytes of memory to a model of around 6.5 MB.</p>
+
+      <p>But the prototype was not ready to replace trying on a real shoe.</p>
+
+      <p>The quality still depended heavily on the original video. Reflective materials, missing viewpoints, blur, and poor lighting could affect the reconstruction. Mesh extraction took much longer than Gaussian training. Foot alignment and occlusion could still fail in unusual poses.</p>
+
+      <p>And seeing a shoe on your feet is not the same as knowing whether it will fit.</p>
+
+      <p>The project dealt with appearance, not physical comfort or sizing.</p>
+
+      <p>Still, it showed that the complete idea was technically possible: a relatively short phone video could become a reconstructed 3D shoe, and that shoe could then appear on someone's feet through a mobile camera.</p>
+
+      <h2>What it led to</h2>
+
+      <p>We wrote the work up as a paper and continued thinking about how the pipeline could extend beyond shoes to other products in fashion.</p>
+
+      <p>But its biggest effect on me came later.</p>
+
+      <p>Before this project, 3D reconstruction had mostly been something I understood through individual techniques and examples. This was the first time we had taken it through a complete application: from collecting our own data to producing a model that a person could interact with on a phone.</p>
+
+      <p>It also gave us the experience that later made a much larger idea seem possible.</p>
+
+      <p>For our next project, instead of reconstructing an object that could fit on a table, we tried reconstructing parts of <a href="/work/patan-reconstruction/">Patan Durbar Square</a>.</p>
+
+      <p>A shoe was where we learned the pipeline.</p>
+
+      <p>The temples were where we tested how far we could take it.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-links">
+      <a href="mailto:vishalpokharel@seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5h18v14H3V5Zm2.2 2 6.8 5.1L18.8 7H5.2Zm13.8 10V9.2l-7 5.2-7-5.2V17h14Z"/></svg>
+        Email
+      </a>
+      <a href="https://x.com/VishalPokharel3">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M13.7 10.7 21.1 2h-1.8l-6.4 7.5L7.8 2H2l7.8 11.4L2 22h1.8l6.8-7.9 5.4 7.9h5.8l-8.1-11.3Zm-2.4 2.8-.8-1.1L4.3 3.3H7l5 7.3.8 1.1 6.6 9.2h-2.7l-5.4-7.4Z"/></svg>
+        X
+      </a>
+      <a href="https://www.linkedin.com/in/vishal-pokharel-87a250246/">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.8 3.5a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2ZM3 9.3h3.6V21H3V9.3Zm6 0h3.4v1.6h.1c.5-.9 1.7-1.9 3.5-1.9 3.7 0 4.4 2.4 4.4 5.6V21h-3.6v-5.7c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H9V9.3Z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15.8 15.8 0 0 0-1.2-3.1A8.1 8.1 0 0 1 18.9 8ZM12 4.1c.8 1.1 1.5 2.4 1.9 3.9h-3.8c.4-1.5 1.1-2.8 1.9-3.9ZM4.3 14a8.5 8.5 0 0 1 0-4h3.4a16.8 16.8 0 0 0 0 4H4.3Zm.8 2h3a15.8 15.8 0 0 0 1.2 3.1A8.1 8.1 0 0 1 5.1 16Zm3-8h-3a8.1 8.1 0 0 1 4.2-3.1A15.8 15.8 0 0 0 8.1 8Zm3.9 11.9c-.8-1.1-1.5-2.4-1.9-3.9h3.8c-.4 1.5-1.1 2.8-1.9 3.9ZM14.3 14H9.7a14.1 14.1 0 0 1 0-4h4.6a14.1 14.1 0 0 1 0 4Zm.4 5.1a15.8 15.8 0 0 0 1.2-3.1h3a8.1 8.1 0 0 1-4.2 3.1ZM16.3 14a16.8 16.8 0 0 0 0-4h3.4a8.5 8.5 0 0 1 0 4h-3.4Z"/></svg>
+        seoaiagent.ai
+      </a>
+    </span>
+    <span>I’m building an AI teammate for local SEO agencies.</span>
+  </footer>
+</body>
+</html>

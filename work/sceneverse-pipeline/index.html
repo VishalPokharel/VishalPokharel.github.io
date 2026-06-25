@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teaching a language model where furniture should go | Vishal Pokharel</title>
+  <meta name="description" content="A 3D fine-tuning experiment that converted furnished rooms into text, fine-tuned Llama, and mapped generated object placements back into 3D.">
+  <meta property="og:title" content="Teaching a language model where furniture should go">
+  <meta property="og:description" content="How Vishal built an end-to-end 3D scene fine-tuning loop in ten days.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://vishalpokharel.github.io/images/sceneverse-wandb-bbox-point-cloud.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://vishalpokharel.github.io/work/sceneverse-pipeline/">
+  <link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/">Vishal Pokharel</a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/books/">Reading</a>
+      <a href="/blogs/">Blogs</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page">
+    <article class="reading">
+      <h1>Teaching a language model where furniture should go</h1>
+
+      <p>While working at <a href="https://sceneverse.ai/">Sceneverse</a> with <a href="https://pramishp.github.io/">Pramish</a>, he gave me a research idea to test.</p>
+
+      <p>The question was whether a language model could learn something about how objects are arranged inside a 3D room.</p>
+
+      <p>Given the type of room and the objects already present, could the model suggest reasonable positions for new objects?</p>
+
+      <p>For example, if a bedroom already had a bed, two wardrobes, a dressing table, doors, and windows, could the model suggest where another piece of furniture should be placed without putting it through a wall, blocking a door, or ignoring the rest of the room?</p>
+
+      <p>The model would not see the room as an image. It would receive a text representation of it.</p>
+
+      <p>Pramish pointed me toward datasets such as <a href="https://arxiv.org/abs/2011.09127">3D-FRONT</a> and <a href="https://arxiv.org/abs/2009.09633">3D-FUTURE</a>, along with a few papers and repositories that could help me understand possible approaches.</p>
+
+      <p>He asked me to try to get the experiment working in three days.</p>
+
+      <p>I took that deadline very seriously.</p>
+
+      <h2>First, I had to understand the rooms</h2>
+
+      <p><a href="https://arxiv.org/abs/2011.09127">3D-FRONT</a> contains furnished indoor scenes. <a href="https://arxiv.org/abs/2009.09633">3D-FUTURE</a> contains detailed 3D furniture models used in those scenes.</p>
+
+      <p>Together, they contain the information needed to understand a room: its walls, doors, windows, furniture, object positions, rotations, and dimensions.</p>
+
+      <p>But the data was not immediately usable for training.</p>
+
+      <p>I had to go through the dataset, understand how the scenes were represented, separate the different room types, extract the objects, calculate or retrieve their bounding boxes, and convert everything into one consistent structure.</p>
+
+      <p>One major preprocessing problem was that the data often came in a flat scene or house-level form, not as clean individual rooms. Doors and windows could be shared between rooms. But in the raw representation, a shared door or window might be mentioned under only one room. If I separated the rooms naively, the neighboring room would lose that opening entirely. I had to detect those mutual doors and windows and attach them to the other room too, so the room representation did not silently remove important geometry.</p>
+
+      <p>At first, I thought this would be the preparation before the actual work.</p>
+
+      <p>It became most of the work.</p>
+
+      <p>A script would process hundreds of scenes correctly and then fail on one scene that had some unusual structure. I would fix that case, run it again, and discover another assumption that did not hold.</p>
+
+      <p>Sometimes an object was missing information. Sometimes the coordinate representation behaved differently from what I expected. Sometimes a room contained something that my preprocessing code had not been written to handle.</p>
+
+      <p>Each time I thought the preprocessing was nearly finished, the dataset showed me another way it could break.</p>
+
+      <p>I started waking up at around three in the morning with possible solutions to some of these edge cases. I would think of a different way to normalize something, handle a malformed scene, or make the representation more consistent, and then get up to try it.</p>
+
+      <p>It was stressful because the three-day deadline had already started running in my head. But it was also one of the first times I had become so absorbed in a technical problem that I continued thinking about it even while trying to sleep.</p>
+
+      <h2>Turning a 3D scene into text</h2>
+
+      <p>Once the scenes were clean enough, I needed to represent them in a form a language model could read.</p>
+
+      <p>For each room, I converted the important spatial information into structured text.</p>
+
+      <p>The representation included things such as:</p>
+
+      <ul>
+        <li>The room type</li>
+        <li>Walls</li>
+        <li>Doors and windows</li>
+        <li>Existing object categories</li>
+        <li>Object positions</li>
+        <li>Object rotations</li>
+        <li>Bounding-box dimensions</li>
+      </ul>
+
+      <p>A room was therefore described as a sequence of structured text entries rather than as an image or raw 3D file.</p>
+
+      <p>The exact format mattered a lot.</p>
+
+      <p>It had to contain enough information for the model to understand the current arrangement. But it also needed to remain regular enough that a generated answer could later be parsed by code.</p>
+
+      <p>The training task was roughly:</p>
+
+      <blockquote>
+        <p>Here is the type of room and the current arrangement of objects. Suggest the positions and dimensions of additional objects that could be placed in the room.</p>
+      </blockquote>
+
+      <p>The expected output used the same structured format, describing the new objects and their proposed bounding boxes.</p>
+
+      <p>I eventually generated roughly 6,000 examples for the experiment.</p>
+
+      <figure class="essay-figure">
+        <pre><code>wall_0=Wall(1.9743586778640747,-6.613202476501465,0.026850323379039767,5.224358677864075,-6.613202476501465,0.026850323379039767,2.68,0.0)
+wall_1=Wall(1.9743586778640747,-6.613202476501465,0.026850323379039767,1.9743586778640747,-1.7632024765014647,0.026850323379039767,2.68,0.0)
+wall_2=Wall(5.224358677864075,-6.613202476501465,0.026850323379039767,5.224358677864075,-1.7632024765014647,0.026850323379039767,2.68,0.0)
+wall_3=Wall(1.9743586778640747,-1.7632024765014647,0.026850323379039767,5.224358677864075,-1.7632024765014647,0.026850323379039767,2.68,0.0)
+door_0=Door(wall_1,1.9743586778640747,-2.2632024765014647,1.0768503233790399,0.8800000000000001,2.08)
+door_1=Door(wall_3,4.224358677864075,-1.7632024765014647,1.0768503233790399,0.8800000000000001,2.08)
+window_0=Window(wall_0,3.5243586778640745,-6.613202476501465,1.4268503233790397,3.12,1.8800000000000001)
+window_1=Window(wall_2,5.224358677864075,-6.013202476501465,1.4268503233790397,1.2400000000000002,1.8800000000000001)
+bbox_0=Bbox(bed,4.174358677864075,-4.513202476501465,0.4268503233790398,-1.5708000000000002,1.84375,2.09375,0.84375)
+bbox_1=Bbox(nightstand,5.0243586778640745,-3.2632024765014647,0.22685032337903976,-1.5708000000000002,0.46875,0.375,0.4375)
+bbox_2=Bbox(dressing_table,4.874358677864075,-6.013202476501465,0.6268503233790398,-1.5708000000000002,1.1875,0.46875,1.1875)
+bbox_3=Bbox(wardrobe,4.424358677864075,-2.663202476501465,1.2768503233790398,-3.1416,1.65625,0.46875,2.53125)
+bbox_4=Bbox(wardrobe,1.9743586778640747,-4.513202476501465,1.2768503233790398,-1.5708000000000002,2.8125,0.3125,2.53125)</code></pre>
+        <figcaption class="caption">A sample room represented as structured text: walls, doors, windows, and object bounding boxes.</figcaption>
+      </figure>
+
+      <h2>Seeing the data in 3D</h2>
+
+      <p>Reading rows of coordinates was not enough. I needed to check whether the data actually represented the room I thought it did.</p>
+
+      <p>So I set up scene visualization in <a href="https://wandb.ai/site/">Weights & Biases</a>.</p>
+
+      <p>For the processed scenes, I exported both the point clouds and the object bounding boxes. This allowed me to open a scene inside W&B and inspect its spatial structure instead of relying only on the text representation.</p>
+
+      <figure class="essay-figure wide-figure">
+        <img src="../../images/sceneverse-wandb-bbox-point-cloud.png" alt="Weights and Biases visualization of a 3D room point cloud and bounding boxes">
+        <figcaption class="caption">Point cloud and bounding-box visualization in Weights & Biases.</figcaption>
+      </figure>
+
+      <p>I could see the room geometry, the objects, and the bounding boxes around them. If a preprocessing mistake placed an object in the wrong location or produced an incorrect box, it became much easier to notice visually.</p>
+
+      <p>This setup helped me verify several different parts of the pipeline:</p>
+
+      <ul>
+        <li>Whether the original scene had been parsed correctly</li>
+        <li>Whether object positions and dimensions were preserved</li>
+        <li>Whether the bounding boxes matched the furniture</li>
+        <li>Whether the generated suggestions made spatial sense</li>
+        <li>Whether an error came from the model or from preprocessing</li>
+      </ul>
+
+      <p>It was satisfying to move between the same scene in different forms: first as raw 3D data, then as structured text, and finally as a point cloud and bounding boxes inside W&B.</p>
+
+      <figure class="poster-strip">
+        <img src="../../images/sceneverse-sample-visualizer-room.png" alt="Sample 3D room visualization from the Sceneverse pipeline">
+        <img src="../../images/sceneverse-rerun-viewer-sample-room.png" alt="Rerun viewer sample room from the Sceneverse pipeline">
+        <figcaption class="caption">Other visual checks from the pipeline.</figcaption>
+      </figure>
+
+      <h2>Fine-tuning Llama</h2>
+
+      <p>After preparing the data, I fine-tuned a <a href="https://www.llama.com/">Llama model</a> on the generated examples.</p>
+
+      <p>This was my first time setting up the complete fine-tuning loop myself.</p>
+
+      <p>I had to prepare the training format, configure the run, send the data through the model, track the training, inspect the generated outputs, find problems, modify the setup, and run it again.</p>
+
+      <p>I used <a href="https://wandb.ai/site/">Weights & Biases</a> for the training runs as well.</p>
+
+      <p>On one side, I could watch the training metrics and compare how different runs progressed. On the other, I could inspect the actual 3D scenes, their point clouds, and bounding boxes.</p>
+
+      <p>Watching the loss improve was exciting, but it was not enough to tell me whether the experiment was working.</p>
+
+      <p>A model could produce a lower loss and still generate output that my code could not use. It might omit one of the bounding-box values, change the structure, add an explanation in the middle, or suggest an object placement that looked unreasonable when placed inside the room.</p>
+
+      <p>So after each run, I had to look at both sides:</p>
+
+      <ul>
+        <li>What the training graphs were showing</li>
+        <li>What the model was actually generating</li>
+      </ul>
+
+      <p>That distinction became important. A machine-learning experiment can look promising in a chart and still fail when you try to use its output in the original system.</p>
+
+      <h2>Putting the suggestions back into the room</h2>
+
+      <p>The final step was to take the model’s generated text and turn it back into spatial data.</p>
+
+      <p>The model received the current room setup and generated suggestions for new objects. I parsed those suggestions, extracted the object categories, positions, rotations, and bounding-box dimensions, and mapped them back into the 3D scene.</p>
+
+      <p>The complete loop was:</p>
+
+      <pre><code>Raw 3D scene
+-> cleaned room and object data
+-> structured text representation
+-> training examples
+-> Llama fine-tuning
+-> suggested positions for new objects
+-> parsed bounding boxes
+-> visualization inside the 3D room</code></pre>
+
+      <p>The goal was not to build a finished interior-design system in ten days.</p>
+
+      <p>It was to test whether this research direction made sense at all.</p>
+
+      <p>Could a language model learn patterns from existing room layouts and generate new object-placement suggestions that could be converted back into a 3D environment?</p>
+
+      <p>The prototype worked well enough to show that the approach was worth studying further.</p>
+
+      <p>It was limited training, with a relatively small experimental dataset. It still needed better evaluation, more careful comparisons, stronger constraints, and much more training before it could become a full system.</p>
+
+      <p>But the complete loop worked.</p>
+
+      <h2>I thought taking ten days was a failure</h2>
+
+      <p>I did not finish the experiment in three days.</p>
+
+      <p>It took me ten.</p>
+
+      <p>Once the third day passed, every extra day felt terrible. I had accepted the deadline so fully that I felt slow each morning the work was still unfinished.</p>
+
+      <p>The preprocessing edge cases were taking longer than expected. Then the text format needed changes. Then I needed the output to remain parseable. Then the training completed, but the generated suggestions still needed to be inspected and visualized.</p>
+
+      <p>There always seemed to be one more part before I could call the loop complete.</p>
+
+      <p>When I finally showed Pramish the working result, I was disappointed that it had taken ten days.</p>
+
+      <p>He then told me that internally, they had estimated that it might take around thirty days.</p>
+
+      <p>That gave me some relief.</p>
+
+      <p>It also made the three-day deadline feel useful rather than unfair. Trying to finish in three days had forced me to move toward a working end-to-end version instead of spending weeks trying to understand every paper and every part of the dataset before building anything.</p>
+
+      <p>I missed the target I had in my head.</p>
+
+      <p>But I completed in ten days something they had thought could take thirty.</p>
+
+      <h2>Prototype demo</h2>
+
+      <p>The videos below are not the exact output of the fine-tuning pipeline. I built them later as prototypes on top of scenes to demonstrate the idea and make it easier to pitch: natural-language-driven changes to a 3D room, and a spatial agent that could understand a 3D scene through language.</p>
+
+      <div class="demo-grid">
+        <figure class="case-media">
+          <video controls preload="metadata" poster="../../images/reconfigure-demo.png">
+            <source src="../../videos/reconfigure-demo.mp4" type="video/mp4">
+          </video>
+          <figcaption class="caption">A room reconfiguration prototype built for demonstration and pitch purposes, not the exact output of the fine-tuning experiment.</figcaption>
+        </figure>
+
+        <figure class="case-media">
+          <video controls preload="metadata" poster="../../images/spatial-agent.png">
+            <source src="../../videos/spatial-agent.mp4" type="video/mp4">
+          </video>
+          <figcaption class="caption">A spatial agent demo using a 3D scene, showing how natural-language queries could connect to navigation and scene understanding.</figcaption>
+        </figure>
+      </div>
+
+      <h2>What the experiment changed for me</h2>
+
+      <p>After the first version worked, I continued reading.</p>
+
+      <p>I went through around ten more papers related to scene generation, spatial representation, language models, and object placement. The topic slowly stopped feeling like something I was only trying to understand from the outside.</p>
+
+      <p>I reached a point where I could compare different approaches, see the weaknesses in our experiment, and think about what a new research direction or paper might look like.</p>
+
+      <p>We did not turn this prototype into a complete research system. The experiment was mainly meant to test whether the approach had potential, and it did enough to validate that.</p>
+
+      <p>But it gave me something I needed at the time: confidence.</p>
+
+      <p>Before this, I had worked on machine-learning and 3D projects, but I was not sure whether I could own a research-heavy technical problem from beginning to end.</p>
+
+      <p>In this project, I had to understand raw 3D data, solve preprocessing failures, design a text representation, create the training samples, fine-tune the model, configure W&B, export point clouds and bounding boxes, observe the training, parse the generated suggestions, and place them back into a 3D scene.</p>
+
+      <p>I had worked through the entire loop myself.</p>
+
+      <p>I did not understand every part when I began. Most of the important parts were things I had to learn while building them.</p>
+
+      <p>That was what gave me confidence that I could become a technical builder.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-links">
+      <a href="mailto:vishalpokharel@seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5h18v14H3V5Zm2.2 2 6.8 5.1L18.8 7H5.2Zm13.8 10V9.2l-7 5.2-7-5.2V17h14Z"/></svg>
+        Email
+      </a>
+      <a href="https://x.com/VishalPokharel3">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M13.7 10.7 21.1 2h-1.8l-6.4 7.5L7.8 2H2l7.8 11.4L2 22h1.8l6.8-7.9 5.4 7.9h5.8l-8.1-11.3Zm-2.4 2.8-.8-1.1L4.3 3.3H7l5 7.3.8 1.1 6.6 9.2h-2.7l-5.4-7.4Z"/></svg>
+        X
+      </a>
+      <a href="https://www.linkedin.com/in/vishal-pokharel-87a250246/">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.8 3.5a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2ZM3 9.3h3.6V21H3V9.3Zm6 0h3.4v1.6h.1c.5-.9 1.7-1.9 3.5-1.9 3.7 0 4.4 2.4 4.4 5.6V21h-3.6v-5.7c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H9V9.3Z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15.8 15.8 0 0 0-1.2-3.1A8.1 8.1 0 0 1 18.9 8ZM12 4.1c.8 1.1 1.5 2.4 1.9 3.9h-3.8c.4-1.5 1.1-2.8 1.9-3.9ZM4.3 14a8.5 8.5 0 0 1 0-4h3.4a16.8 16.8 0 0 0 0 4H4.3Zm.8 2h3a15.8 15.8 0 0 0 1.2 3.1A8.1 8.1 0 0 1 5.1 16Zm3-8h-3a8.1 8.1 0 0 1 4.2-3.1A15.8 15.8 0 0 0 8.1 8Zm3.9 11.9c-.8-1.1-1.5-2.4-1.9-3.9h3.8c-.4 1.5-1.1 2.8-1.9 3.9ZM14.3 14H9.7a14.1 14.1 0 0 1 0-4h4.6a14.1 14.1 0 0 1 0 4Zm.4 5.1a15.8 15.8 0 0 0 1.2-3.1h3a8.1 8.1 0 0 1-4.2 3.1ZM16.3 14a16.8 16.8 0 0 0 0-4h3.4a8.5 8.5 0 0 1 0 4h-3.4Z"/></svg>
+        seoaiagent.ai
+      </a>
+    </span>
+    <span>I’m building an AI teammate for local SEO agencies.</span>
+  </footer>
+</body>
+</html>

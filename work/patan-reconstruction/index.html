@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reconstructing Patan Durbar Square from videos | Vishal Pokharel</title>
+  <meta name="description" content="How Vishal Pokharel and his team reconstructed Patan Durbar Square from phone videos using COLMAP, Gaussian Splatting, masking, and a web viewer.">
+  <meta property="og:title" content="Reconstructing Patan Durbar Square from videos">
+  <meta property="og:description" content="A cultural heritage reconstruction project that became a published paper in Digital Applications in Archaeology and Cultural Heritage.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://vishalpokharel.github.io/images/3d-reconstruction.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://vishalpokharel.github.io/work/patan-reconstruction/">
+  <link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/">Vishal Pokharel</a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/books/">Reading</a>
+      <a href="/blogs/">Blogs</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page">
+    <article class="reading">
+      <h1>Reconstructing Patan Durbar Square from videos</h1>
+
+      <p>During our third-year minor project, my friends and I had worked on reconstructing shoes in 3D for a virtual try-on application.</p>
+
+      <p>By the time we had to choose our fourth-year major project, we had some experience with 3D reconstruction. Jyoti sir suggested that we try applying what we had learned to something much larger: cultural heritage sites.</p>
+
+      <p>That eventually led us to Patan Durbar Square.</p>
+
+      <p>A shoe can be placed on a table, photographed from every direction, and captured again whenever something goes wrong.</p>
+
+      <p>A temple cannot.</p>
+
+      <p>It is always there, surrounded by people, birds, changing light, shadows, neighbouring buildings, and parts that are difficult to see from the ground. We soon learned that reconstructing a public heritage site was as much a data-collection problem as a machine-learning problem.</p>
+
+      <p>The project eventually became our paper, <a href="https://www.sciencedirect.com/science/article/abs/pii/S2212054825000943">“3D reconstruction of cultural heritage sites: A case study of Patan Durbar Square”</a>, published in Elsevier’s <em>Digital Applications in Archaeology and Cultural Heritage</em>.</p>
+
+      <p>You can also <a href="https://www.linkedin.com/posts/pratik-shrestha-8213881ab_virtualheritage-3dreconstruction-gaussiansplatting-ugcPost-7320662096961069056-SnnX">watch the final reconstruction here</a>.</p>
+
+      <figure class="case-media">
+        <video controls preload="metadata" poster="../../images/3d-reconstruction.png">
+          <source src="../../videos/3d-reconstruction.mp4" type="video/mp4">
+        </video>
+        <figcaption class="caption">Final reconstruction video from the Patan Durbar Square project.</figcaption>
+      </figure>
+
+      <h2>The first challenge was deciding when to go</h2>
+
+      <p>Before we could train anything, we had to capture the square properly.</p>
+
+      <p>We first had to figure out which time of day would give us usable footage. If we went when it was crowded, people would block large parts of the structures. If the sunlight was too harsh, the shadows and brightness could change sharply as we walked around a temple. If the footage was blurred or did not overlap enough, the reconstruction could fail later.</p>
+
+      <p>There was no way to know immediately whether a capture was good enough. We could spend time recording a structure, return with gigabytes of data, process it, and only then discover that some angle or section had not been captured properly.</p>
+
+      <p>We recorded videos while walking around the structures at different distances and heights. We tried to keep neighbouring frames overlapping so that the system could understand that two images were looking at the same physical points from slightly different positions.</p>
+
+      <p>We captured sites including Krishna Mandir, Vishwanath Temple, Charnarayan Temple, Maharani Hiti, Chyasin Dega, courtyards, statues, and several other structures around Patan Durbar Square.</p>
+
+      <p>For each site, we later extracted hundreds or sometimes more than a thousand frames from the videos.</p>
+
+      <p>We came back with gigabytes of images.</p>
+
+      <p>That was only the beginning.</p>
+
+      <h2>We wanted a view from above</h2>
+
+      <p>One thing we wanted was drone footage.</p>
+
+      <p>From the ground, it is difficult to capture rooftops and elevated architectural details. You can walk around a temple many times and still never show the camera what the top actually looks like.</p>
+
+      <p>We tried to get permission to use a drone at Patan Durbar Square, but we were not able to get access.</p>
+
+      <p>So most of our Patan data had to be captured from the ground.</p>
+
+      <p>This later became one of the clearest limitations of the project. The reconstruction looked good from the angles represented in the videos, but areas that the camera had never properly seen could become incomplete or distorted.</p>
+
+      <p>It was a useful lesson: a model cannot reconstruct information that was never present in the data.</p>
+
+      <h2>Turning thousands of images into a scene</h2>
+
+      <p>Once we had the footage, we extracted individual frames and passed them through COLMAP.</p>
+
+      <p>COLMAP tries to identify the same visual features across different images. From those matches, it estimates where the camera was positioned when each image was captured and generates an initial sparse point cloud of the scene.</p>
+
+      <p>In simple terms, it takes a large collection of overlapping images and begins to work out how they relate to one another in 3D space.</p>
+
+      <p>That camera information and sparse point cloud then became the starting point for Gaussian Splatting.</p>
+
+      <p>Instead of representing the site only as a traditional polygon mesh, Gaussian Splatting represents it using a large collection of small 3D Gaussians. Each one has properties such as position, color, shape, scale, and opacity.</p>
+
+      <p>When rendered together, they reproduce the appearance of the original scene from different viewpoints.</p>
+
+      <p>The first time the reconstruction began to look like the actual square was exciting. You could move the camera through a scene that had been created from ordinary videos captured on a phone.</p>
+
+      <p>But the first results also had many strange things inside them.</p>
+
+      <h2>People became floating artifacts</h2>
+
+      <p>Patan Durbar Square is a public place. People were constantly walking through the videos. Birds would appear for a few frames and then disappear. Objects moved. Lighting changed.</p>
+
+      <p>The reconstruction method assumes that the scene is mostly static.</p>
+
+      <p>A temple remains in the same place across every frame. A person does not.</p>
+
+      <p>Because a person appeared in some images but not others, the system sometimes reconstructed pieces of them as blurry floating artifacts. The same happened with birds and other moving objects. From one angle, the scene could look clean. As soon as we moved the virtual camera, a strange collection of colors or Gaussian blobs might appear in the air.</p>
+
+      <p>The baseline reconstruction could be technically successful and still look obviously wrong.</p>
+
+      <p>At first, we removed some of these blobs manually. We would inspect the scene, identify unwanted Gaussians, and clean them up.</p>
+
+      <p>That worked, but doing it manually for every site would not scale.</p>
+
+      <p>So we began experimenting with removing the unwanted objects before training the reconstruction.</p>
+
+      <h2>Masking the things that should not be there</h2>
+
+      <p>We used GroundingDINO to detect objects such as people and birds in the extracted frames.</p>
+
+      <p>GroundingDINO could take a text prompt like “person” or “bird” and return the part of the image where that object appeared.</p>
+
+      <p>We then passed those detected areas to the Segment Anything Model, or SAM, to produce a more precise mask around each object.</p>
+
+      <p>During reconstruction, those masked regions were ignored.</p>
+
+      <p>This meant the system could learn from the temple, ground, walls, and surrounding structures without trying to reconstruct every person who happened to walk past the camera.</p>
+
+      <p>The difference was easy to see. Many of the floating human-shaped and bird-shaped artifacts disappeared.</p>
+
+      <p>Interestingly, the improvement was not always obvious in the usual numerical metrics.</p>
+
+      <p>A model with visible artifacts could sometimes receive a similar or even better score than one that looked cleaner to us. Metrics such as PSNR and SSIM measure particular kinds of image similarity, but they do not always capture whether a floating blob ruins the experience of moving through a 3D scene.</p>
+
+      <p>That made visual inspection an important part of our evaluation.</p>
+
+      <p>We had to look at the metrics, but we also had to actually enter the scene and move around it.</p>
+
+      <h2>Trying different versions of Gaussian Splatting</h2>
+
+      <p>We did not settle on the first implementation that produced a result.</p>
+
+      <p>We compared the original Gaussian Splatting pipeline with Splatfacto, an implementation built around gsplat and Nerfstudio.</p>
+
+      <p>Splatfacto was faster and gave us easier access to additional techniques such as masking and bilateral grids.</p>
+
+      <p>The bilateral grid helped with a different problem.</p>
+
+      <p>Phone cameras do not always process every frame in exactly the same way. Exposure, brightness, and other image adjustments can change slightly as the camera moves. In the final reconstruction, those inconsistencies could appear as bright-colored floaters, especially around the sky, or create uneven-looking surfaces.</p>
+
+      <p>Using a bilateral grid helped the model account for some of those image-processing differences.</p>
+
+      <p>It increased training time, but the training was still manageable. A scene that took around seven or eight minutes in the simpler setup could take around twenty minutes with the bilateral grid.</p>
+
+      <p>We tried several combinations:</p>
+
+      <ul>
+        <li>The original Gaussian Splatting implementation</li>
+        <li>Splatfacto without additional techniques</li>
+        <li>Splatfacto with masking</li>
+        <li>Splatfacto with masking and bilateral grids</li>
+        <li>Separate training for individual structures</li>
+        <li>Joint training for neighbouring structures</li>
+      </ul>
+
+      <p>Some of the results were not what we expected.</p>
+
+      <p>Training two adjacent sites together sometimes produced a more continuous reconstruction than training them separately and placing them beside one another later. The overlapping images helped the model understand how the two structures related spatially.</p>
+
+      <p>But combining more and more sites did not continue improving the result.</p>
+
+      <p>When we combined three larger datasets, the output became worse. Increasing the number of Gaussians did not solve it.</p>
+
+      <p>More data was not automatically better. The additional scale and complexity made the optimization harder.</p>
+
+      <h2>Some blobs still had to be removed by hand</h2>
+
+      <p>Masking and bilateral grids removed many artifacts, but they did not make every reconstruction perfect.</p>
+
+      <p>Some areas had not been captured with enough detail. Some masks were inaccurate. Some residual Gaussians still appeared where they should not.</p>
+
+      <p>We imported the reconstructed models into Blender and manually cleaned the remaining artifacts.</p>
+
+      <p>This was one of the less glamorous parts of the project.</p>
+
+      <p>You could automate most of the pipeline, train sophisticated models, and evaluate multiple configurations, but the final scene could still contain one bright blob floating beside a temple that had to be found and removed manually.</p>
+
+      <p>The final output was a combination of automated reconstruction, experiments, visual judgment, and patient cleanup.</p>
+
+      <h2>Building a way to explore the result</h2>
+
+      <p>A reconstructed scene stored on our computers was not very useful by itself.</p>
+
+      <p>We wanted people to be able to move through Patan Durbar Square virtually, so we built a web viewer for the Gaussian splats.</p>
+
+      <p>The raw splat files were large, so we worked on compressing and loading them in a way that could still render smoothly in a browser.</p>
+
+      <p>We also added a map interface. A user could choose different locations around Patan Durbar Square, move between reconstructed sites, and read information about the structures.</p>
+
+      <p>That was the point where the project began to feel less like a collection of experiments and more like something a normal person could experience.</p>
+
+      <p>The result was not a recorded fly-through or a stitched panoramic video. It was an interactive 3D environment. A person could change the viewpoint and move through the reconstructed space.</p>
+
+      <h2>Then we had to write the paper</h2>
+
+      <p>Building the system was only one part of the project.</p>
+
+      <p>We also had to explain what we had done, compare the methods, organize the experiments, create visualizations, report the metrics, discuss what failed, and place the work in the context of existing research.</p>
+
+      <p>I worked across the software, data collection, visualization, experiments, and writing.</p>
+
+      <p>Writing the paper forced us to be more precise about claims that had felt obvious while building.</p>
+
+      <p>For example, we could see that masking removed artifacts. But how should we measure that? What happened when the visual quality improved but standard metrics barely changed? Why did combining two datasets help while combining three made the result worse? What could the system genuinely support, and what remained future work?</p>
+
+      <p>We had to turn months of experiments, failed runs, images, models, and observations into one coherent account.</p>
+
+      <p>The paper went through writing, revision, and review before it was eventually accepted and published by Elsevier.</p>
+
+      <p>Seeing the work on ScienceDirect felt very different from submitting the college project.</p>
+
+      <p>The project had begun with Jyoti sir suggesting that we apply our previous 3D reconstruction experience to cultural heritage. It ended with a published paper and an actual pipeline that someone else could reproduce and extend.</p>
+
+      <h2>What I remember from it</h2>
+
+      <p>The polished output makes the process look more orderly than it was.</p>
+
+      <p>What I remember is choosing when to visit Patan, repeatedly walking around structures with a phone, returning with gigabytes of footage, discovering missing viewpoints, processing thousands of frames, waiting for COLMAP, watching training runs, finding people turned into floating blobs, trying masks, comparing scenes, cleaning Gaussian artifacts manually, and rewriting sections of the paper.</p>
+
+      <p>I also remember the part we could not do.</p>
+
+      <p>Not getting drone access meant that some roofs and higher areas remained poorly represented. It was disappointing, but it made the limitation of ground-only capture very clear. If we did the project again, aerial views would be one of the first additions.</p>
+
+      <p>Our reconstruction was not a perfect digital copy of Patan Durbar Square. It was an experiment in how far a small team could go using videos from a phone, modern reconstruction methods, and a lot of iteration.</p>
+
+      <p>The work showed that heritage sites could be documented without specialized scanning equipment, and that the resulting models could support virtual exploration, education, research, and eventually restoration work.</p>
+
+      <p>For me, it also completed a strange progression.</p>
+
+      <p>We had started by reconstructing a shoe so someone could view it in augmented reality.</p>
+
+      <p>A year later, we were using the same curiosity to reconstruct temples and courtyards that had stood for centuries.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-links">
+      <a href="mailto:vishalpokharel@seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5h18v14H3V5Zm2.2 2 6.8 5.1L18.8 7H5.2Zm13.8 10V9.2l-7 5.2-7-5.2V17h14Z"/></svg>
+        Email
+      </a>
+      <a href="https://x.com/VishalPokharel3">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M13.7 10.7 21.1 2h-1.8l-6.4 7.5L7.8 2H2l7.8 11.4L2 22h1.8l6.8-7.9 5.4 7.9h5.8l-8.1-11.3Zm-2.4 2.8-.8-1.1L4.3 3.3H7l5 7.3.8 1.1 6.6 9.2h-2.7l-5.4-7.4Z"/></svg>
+        X
+      </a>
+      <a href="https://www.linkedin.com/in/vishal-pokharel-87a250246/">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.8 3.5a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2ZM3 9.3h3.6V21H3V9.3Zm6 0h3.4v1.6h.1c.5-.9 1.7-1.9 3.5-1.9 3.7 0 4.4 2.4 4.4 5.6V21h-3.6v-5.7c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H9V9.3Z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://seoaiagent.ai">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15.8 15.8 0 0 0-1.2-3.1A8.1 8.1 0 0 1 18.9 8ZM12 4.1c.8 1.1 1.5 2.4 1.9 3.9h-3.8c.4-1.5 1.1-2.8 1.9-3.9ZM4.3 14a8.5 8.5 0 0 1 0-4h3.4a16.8 16.8 0 0 0 0 4H4.3Zm.8 2h3a15.8 15.8 0 0 0 1.2 3.1A8.1 8.1 0 0 1 5.1 16Zm3-8h-3a8.1 8.1 0 0 1 4.2-3.1A15.8 15.8 0 0 0 8.1 8Zm3.9 11.9c-.8-1.1-1.5-2.4-1.9-3.9h3.8c-.4 1.5-1.1 2.8-1.9 3.9ZM14.3 14H9.7a14.1 14.1 0 0 1 0-4h4.6a14.1 14.1 0 0 1 0 4Zm.4 5.1a15.8 15.8 0 0 0 1.2-3.1h3a8.1 8.1 0 0 1-4.2 3.1ZM16.3 14a16.8 16.8 0 0 0 0-4h3.4a8.5 8.5 0 0 1 0 4h-3.4Z"/></svg>
+        seoaiagent.ai
+      </a>
+    </span>
+    <span>I’m building an AI teammate for local SEO agencies.</span>
+  </footer>
+</body>
+</html>
