@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 500" role="img" aria-labelledby="title desc">
+  <title id="title">The Book of Woman cover</title>
+  <desc id="desc">A simple local cover card for The Book of Woman by Osho.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7d8c7"/>
+      <stop offset="0.55" stop-color="#c85b4b"/>
+      <stop offset="1" stop-color="#5b1f2d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="500" fill="url(#bg)"/>
+  <rect x="22" y="24" width="276" height="452" fill="none" stroke="#ffe7d9" stroke-width="3"/>
+  <text x="160" y="72" fill="#fff6ed" font-family="Georgia, serif" font-size="20" text-anchor="middle" letter-spacing="5">OSHO</text>
+  <text x="160" y="190" fill="#fff6ed" font-family="Georgia, serif" font-size="48" font-weight="700" text-anchor="middle">The Book</text>
+  <text x="160" y="248" fill="#fff6ed" font-family="Georgia, serif" font-size="52" font-weight="700" text-anchor="middle">of Woman</text>
+  <line x1="82" y1="300" x2="238" y2="300" stroke="#ffe7d9" stroke-width="2"/>
+  <text x="160" y="348" fill="#ffe7d9" font-family="Georgia, serif" font-size="18" text-anchor="middle">On love, freedom,</text>
+  <text x="160" y="376" fill="#ffe7d9" font-family="Georgia, serif" font-size="18" text-anchor="middle">and awareness</text>
+</svg>
