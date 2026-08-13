@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Books | Vishal Pokharel</title>
-  <meta name="description" content="Books Vishal Pokharel has read or is thinking through, starting with Hooked by Nir Eyal.">
+  <meta name="description" content="Books Vishal Pokharel has read or is thinking through, including Thinking in Bets by Annie Duke.">
   <meta property="og:title" content="Books | Vishal Pokharel">
   <meta property="og:description" content="A small reading list connected to building products, companies, and systems.">
   <meta property="og:type" content="website">
@@ -29,7 +29,12 @@
   </header>
 
   <main id="main" class="page">
-    <section class="book-shelf" aria-label="Currently reading">
+    <section class="book-shelf" aria-label="Books I have read or am thinking through">
+      <button class="book-tile" id="thinking-in-bets" type="button" aria-haspopup="dialog" aria-controls="thinking-in-bets-dialog" data-dialog="thinking-in-bets-dialog">
+        <img src="../images/thinking-in-bets-cover.jpg" alt="Book cover of Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts by Annie Duke">
+        <span>Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts</span>
+      </button>
+
       <button class="book-tile" id="hooked" type="button" aria-haspopup="dialog" aria-controls="hooked-dialog" data-dialog="hooked-dialog">
         <img src="../images/hooked-book-cover.png" alt="Book cover of Hooked: How to Build Habit-Forming Products by Nir Eyal">
         <span>Hooked: How to Build Habit-Forming Products</span>
@@ -91,6 +96,46 @@
       </button>
     </section>
 
+    <section class="reading-block" aria-labelledby="east-west-title">
+      <div class="reading-block-heading">
+        <p class="section-kicker">A note in progress</p>
+        <h2 id="east-west-title">East versus West</h2>
+        <p>Two ways of looking at uncertainty, action, and the stories we tell ourselves about outcomes.</p>
+      </div>
+      <div class="reading-contrast">
+        <article class="reading-side">
+          <h3>East</h3>
+          <h4>Making decisions</h4>
+          <p>I’m starting with a question about how we see clearly before we decide. I’ll add the fuller context here later.</p>
+          <p class="resource-links">
+            <a href="https://www.youtube.com/watch?v=-c3tQTxcMBQ" target="_blank" rel="noopener noreferrer">YouTube resource</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://oshoworld.com/ashtavakra-maha-geeta-35" target="_blank" rel="noopener noreferrer">Full text</a>
+          </p>
+        </article>
+        <article class="reading-side">
+          <h3>West</h3>
+          <h4>Thinking in Bets</h4>
+          <p>Annie Duke’s way into uncertainty: make the best decision you can with incomplete information, then separate the quality of the decision from the luck of the outcome.</p>
+          <p><a href="#thinking-in-bets" data-dialog="thinking-in-bets-dialog">Open the book note</a></p>
+        </article>
+      </div>
+    </section>
+
+    <dialog class="book-dialog" id="thinking-in-bets-dialog">
+      <form method="dialog">
+        <button class="dialog-close" type="submit" aria-label="Close">x</button>
+      </form>
+      <div class="book-dialog-content">
+        <img src="../images/thinking-in-bets-cover.jpg" alt="Book cover of Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts by Annie Duke">
+        <div>
+          <h2>Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts</h2>
+          <p class="meta">Annie Duke</p>
+          <p>This is a book about making decisions when the facts are incomplete and the outcome is partly luck. I’m reading it as a Western counterpart to the questions in the East versus West note above.</p>
+        </div>
+      </div>
+    </dialog>
+
     <dialog class="book-dialog" id="hooked-dialog">
       <form method="dialog">
         <button class="dialog-close" type="submit" aria-label="Close">x</button>
@@ -100,7 +145,7 @@
         <div>
           <h2>Hooked: How to Build Habit-Forming Products</h2>
           <p class="meta">Nir Eyal with Ryan Hoover</p>
-          <p>A product book about feedback loops, triggers, rewards, and how habit-forming products are built.</p>
+          <p>I read this while working on Liart.io during LOCUS. The useful part for me was not treating attention as magic. It gave me language for feedback loops, triggers, rewards, and why people come back to products.</p>
         </div>
       </div>
     </dialog>
@@ -114,7 +159,7 @@
         <div>
           <h2>The Mom Test</h2>
           <p class="meta">Rob Fitzpatrick</p>
-          <p>A short book about doing better customer conversations and asking questions that reveal real behavior.</p>
+          <p>This book made customer conversations feel less mystical. The main idea I took from it was to ask about real behavior and past actions instead of asking people to validate my idea.</p>
         </div>
       </div>
     </dialog>
@@ -128,7 +173,7 @@
         <div>
           <h2>Zero to One</h2>
           <p class="meta">Peter Thiel with Blake Masters</p>
-          <p>A startup book about building something new, monopoly, competition, and thinking from first principles.</p>
+          <p>This pushed me to think about what kind of company is worth building, not just what kind of product can be built. I read it early, when I was still trying to understand startups from first principles.</p>
         </div>
       </div>
     </dialog>
@@ -142,7 +187,7 @@
         <div>
           <h2>Persuasion: The Art of Influencing</h2>
           <p class="meta">James Borg</p>
-          <p>A book about influence, communication, trust, framing, and how people make decisions.</p>
+          <p>This connected directly to how I thought about the door-to-door sales experience: trust cues, reciprocity, framing, contrast, and why a person can feel pulled toward a decision faster than they realize.</p>
         </div>
       </div>
     </dialog>
@@ -156,7 +201,7 @@
         <div>
           <h2>Talking to Humans</h2>
           <p class="meta">Giff Constable</p>
-          <p>A practical book about customer discovery, interviews, and learning from people before building too much.</p>
+          <p>I read this around the same phase as The Mom Test. It helped me think about customer discovery as a real skill, not just a vague instruction to “talk to users.”</p>
         </div>
       </div>
     </dialog>
@@ -170,7 +215,7 @@
         <div>
           <h2>Build: An Unorthodox Guide to Making Things Worth Making</h2>
           <p class="meta">Tony Fadell</p>
-          <p>A product-building book about teams, taste, decisions, execution, and making things people care about.</p>
+          <p>I read this for a more practical view of building: taste, teams, deadlines, judgment, and the messy work of making something useful enough that people actually care.</p>
         </div>
       </div>
     </dialog>
@@ -184,7 +229,7 @@
         <div>
           <h2>The Lean Startup</h2>
           <p class="meta">Eric Ries</p>
-          <p>A startup book about experiments, validated learning, MVPs, and building through repeated feedback loops.</p>
+          <p>I read this while trying to understand how to turn building into learning. The part that stayed with me was being honest about whether an experiment actually taught anything.</p>
         </div>
       </div>
     </dialog>
@@ -198,7 +243,7 @@
         <div>
           <h2>Autobiography of a Yogi</h2>
           <p class="meta">Paramahansa Yogananda</p>
-          <p>A spiritual autobiography by Paramahansa Yogananda.</p>
+          <p>I read this as a spiritual autobiography. It is very different from the startup and product books on this shelf.</p>
         </div>
       </div>
     </dialog>
@@ -212,7 +257,7 @@
         <div>
           <h2>The Book of Man</h2>
           <p class="meta">Osho</p>
-          <p>A book by Osho.</p>
+          <p>I read this during the period when I was reading several Osho books.</p>
         </div>
       </div>
     </dialog>
@@ -226,7 +271,7 @@
         <div>
           <h2>The Book of Woman</h2>
           <p class="meta">Osho</p>
-          <p>A book by Osho.</p>
+          <p>I read this during the period when I was reading several Osho books.</p>
         </div>
       </div>
     </dialog>
@@ -240,7 +285,7 @@
         <div>
           <h2>From Sex to Superconsciousness</h2>
           <p class="meta">Osho</p>
-          <p>A book by Osho.</p>
+          <p>I read this during the period when I was reading several Osho books.</p>
         </div>
       </div>
     </dialog>
@@ -254,7 +299,7 @@
         <div>
           <h2>Fear</h2>
           <p class="meta">Osho</p>
-          <p>A book by Osho.</p>
+          <p>I read this during the period when I was reading several Osho books.</p>
         </div>
       </div>
     </dialog>
@@ -284,6 +329,7 @@
   <script>
     var bookButtons = document.querySelectorAll('.book-tile');
     var bookDialogs = document.querySelectorAll('.book-dialog');
+    var dialogLinks = document.querySelectorAll('[data-dialog]');
 
     function openDialog(dialogId) {
       var dialog = document.getElementById(dialogId);
@@ -296,6 +342,15 @@
       button.addEventListener('click', function () {
         openDialog(button.dataset.dialog);
       });
+    });
+
+    dialogLinks.forEach(function (link) {
+      if (!link.matches('.book-tile')) {
+        link.addEventListener('click', function (event) {
+          event.preventDefault();
+          openDialog(link.dataset.dialog);
+        });
+      }
     });
 
     bookDialogs.forEach(function (dialog) {
