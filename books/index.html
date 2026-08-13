@@ -96,32 +96,6 @@
       </button>
     </section>
 
-    <section class="reading-block" aria-labelledby="east-west-title">
-      <div class="reading-block-heading">
-        <p class="section-kicker">A note in progress</p>
-        <h2 id="east-west-title">East versus West</h2>
-        <p>Two ways of looking at uncertainty, action, and the stories we tell ourselves about outcomes.</p>
-      </div>
-      <div class="reading-contrast">
-        <article class="reading-side">
-          <h3>East</h3>
-          <h4>Making decisions</h4>
-          <p>I’m starting with a question about how we see clearly before we decide. I’ll add the fuller context here later.</p>
-          <p class="resource-links">
-            <a href="https://www.youtube.com/watch?v=-c3tQTxcMBQ" target="_blank" rel="noopener noreferrer">YouTube resource</a>
-            <span aria-hidden="true">·</span>
-            <a href="https://oshoworld.com/ashtavakra-maha-geeta-35" target="_blank" rel="noopener noreferrer">Full text</a>
-          </p>
-        </article>
-        <article class="reading-side">
-          <h3>West</h3>
-          <h4>Thinking in Bets</h4>
-          <p>Annie Duke’s way into uncertainty: make the best decision you can with incomplete information, then separate the quality of the decision from the luck of the outcome.</p>
-          <p><a href="#thinking-in-bets" data-dialog="thinking-in-bets-dialog">Open the book note</a></p>
-        </article>
-      </div>
-    </section>
-
     <dialog class="book-dialog" id="thinking-in-bets-dialog">
       <form method="dialog">
         <button class="dialog-close" type="submit" aria-label="Close">x</button>
@@ -131,7 +105,7 @@
         <div>
           <h2>Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts</h2>
           <p class="meta">Annie Duke</p>
-          <p>This is a book about making decisions when the facts are incomplete and the outcome is partly luck. I’m reading it as a Western counterpart to the questions in the East versus West note above.</p>
+          <p>This is a book about making decisions when the facts are incomplete and the outcome is partly luck. I’m reading it as the Western side of my <a href="/blogs/east-versus-west/">East versus West</a> note.</p>
         </div>
       </div>
     </dialog>
@@ -329,7 +303,6 @@
   <script>
     var bookButtons = document.querySelectorAll('.book-tile');
     var bookDialogs = document.querySelectorAll('.book-dialog');
-    var dialogLinks = document.querySelectorAll('[data-dialog]');
 
     function openDialog(dialogId) {
       var dialog = document.getElementById(dialogId);
@@ -342,15 +315,6 @@
       button.addEventListener('click', function () {
         openDialog(button.dataset.dialog);
       });
-    });
-
-    dialogLinks.forEach(function (link) {
-      if (!link.matches('.book-tile')) {
-        link.addEventListener('click', function (event) {
-          event.preventDefault();
-          openDialog(link.dataset.dialog);
-        });
-      }
     });
 
     bookDialogs.forEach(function (dialog) {
