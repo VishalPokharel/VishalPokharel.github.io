@@ -30,6 +30,11 @@
 
   <main id="main" class="page">
     <section class="book-shelf" aria-label="Books I have read or am thinking through">
+      <button class="book-tile" id="building-a-storybrand" type="button" aria-haspopup="dialog" aria-controls="building-a-storybrand-dialog" data-dialog="building-a-storybrand-dialog">
+        <img src="../images/building-a-storybrand-cover.png" alt="Book cover of Building a StoryBrand: Clarify Your Message So Customers Will Listen by Donald Miller">
+        <span>Building a StoryBrand: Clarify Your Message So Customers Will Listen</span>
+      </button>
+
       <button class="book-tile" id="thinking-in-bets" type="button" aria-haspopup="dialog" aria-controls="thinking-in-bets-dialog" data-dialog="thinking-in-bets-dialog">
         <img src="../images/thinking-in-bets-cover.jpg" alt="Book cover of Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts by Annie Duke">
         <span>Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts</span>
@@ -95,6 +100,19 @@
         <span>Fear</span>
       </button>
     </section>
+
+    <dialog class="book-dialog" id="building-a-storybrand-dialog">
+      <form method="dialog">
+        <button class="dialog-close" type="submit" aria-label="Close">x</button>
+      </form>
+      <div class="book-dialog-content">
+        <img src="../images/building-a-storybrand-cover.png" alt="Book cover of Building a StoryBrand: Clarify Your Message So Customers Will Listen by Donald Miller">
+        <div>
+          <h2>Building a StoryBrand: Clarify Your Message So Customers Will Listen</h2>
+          <p class="meta">Donald Miller</p>
+        </div>
+      </div>
+    </dialog>
 
     <dialog class="book-dialog" id="thinking-in-bets-dialog">
       <form method="dialog">
